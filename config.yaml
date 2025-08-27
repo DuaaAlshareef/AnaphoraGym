@@ -1,0 +1,10 @@
+# ==========================================================
+# Central Configuration for the AnaphoraGym Project
+# ==========================================================
+#
+# INSTRUCTIONS:
+# change the `model_to_run` value below to the Hugging Face
+# identifier of the model you want to test, then run the script.
+#
+
+model_to_run: "gpt2"

@@ -1,0 +1,7 @@
+condition,accuracy_gpt2,accuracy_gpt2-medium,accuracy_EleutherAI_pythia-410m-deduped,accuracy_gpt2-large
+definites,50.0,50.0,25.0,25.0
+events,0.0,50.0,0.0,0.0
+joins,33.33,33.33,33.33,0.0
+propositional_clefting,50.0,50.0,50.0,50.0
+sluicing,25.0,25.0,25.0,25.0
+stripping_VPE,75.0,75.0,50.0,75.0

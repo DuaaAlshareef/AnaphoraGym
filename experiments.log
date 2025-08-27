@@ -1,0 +1,190 @@
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=6, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; ', position=-1, layer=6, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x138697920>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=11, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; ', position=-1, layer=11, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x138697920>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=6, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; ', position=-1, layer=6, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x11fe97920>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=11, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; ', position=-1, layer=11, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x11fe97920>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=6, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='The following describes an event. What happened in this event? Answer:', position=-1, layer=6, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x130597920>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=11, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='The following describes an event. What happened in this event? Answer:', position=-1, layer=11, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x130597920>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=6, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='The event that happened was that', position=-1, layer=6, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x11b57ef20>, max_new_tokens=1)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=11, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='The event that happened was that', position=-1, layer=11, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x11b57ef20>, max_new_tokens=1)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-2, layer=6, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='In the previous event, the main person involved was', position=-1, layer=6, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x1244979c0>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-2, layer=11, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='In the previous event, the main person involved was', position=-1, layer=11, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x1244979c0>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=6, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='In the previous event, the main person involved was', position=-1, layer=6, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x135597ce0>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=11, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='In the previous event, the main person involved was', position=-1, layer=11, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x135597ce0>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=6, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; ', position=-1, layer=6, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x12fa93ce0>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=11, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; ', position=-1, layer=11, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x12fa93ce0>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=6, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt="Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; Alex didn't pass ", position=-1, layer=6, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x10d797ce0>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=11, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt="Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; Alex didn't pass ", position=-1, layer=11, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x10d797ce0>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=6, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt="Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; Alex didn't pass ", position=-1, layer=6, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x120d97ce0>, max_new_tokens=50)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=11, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt="Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; Alex didn't pass ", position=-1, layer=11, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x120d97ce0>, max_new_tokens=50)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=6, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt="Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; Alex didn't pass ", position=-1, layer=6, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x12844bce0>, max_new_tokens=50)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-1, layer=11, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt="Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; Alex didn't pass ", position=-1, layer=11, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x12844bce0>, max_new_tokens=50)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-4, layer=6, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt="Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; Alex didn't pass ", position=-1, layer=6, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x120f97ce0>, max_new_tokens=50)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-4, layer=11, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt="Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; Alex didn't pass ", position=-1, layer=11, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x120f97ce0>, max_new_tokens=50)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-4, layer=6, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor;  ', position=-1, layer=6, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x128993ce0>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-4, layer=11, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor;  ', position=-1, layer=11, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x128993ce0>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-4, layer=6, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; ? ', position=-1, layer=6, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x140897ce0>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-4, layer=11, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; ? ', position=-1, layer=11, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x140897ce0>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-2, layer=6, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='Q: What happened with Sam and Ricky? A: Sam didn’t pass Ricky. Q: What happened with Cory and Harvey? A: Cory didn’t pass Harvey. Q: What happened with Alex and Charlie? A:', position=-1, layer=6, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x10ed97d80>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-2, layer=11, head=None, model_name='gpt2', device='cpu')
+and target:
+TargetContext(prompt='Q: What happened with Sam and Ricky? A: Sam didn’t pass Ricky. Q: What happened with Cory and Harvey? A: Cory didn’t pass Harvey. Q: What happened with Alex and Charlie? A:', position=-1, layer=11, head=None, model_name='gpt2', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x10ed97d80>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-2, layer=20, head=None, model_name='gpt2-medium', device='cpu')
+and target:
+TargetContext(prompt='Q: What happened with Sam and Ricky? A: Sam didn’t pass Ricky. Q: What happened with Cory and Harvey? A: Cory didn’t pass Harvey. Q: What happened with Alex and Charlie? A:', position=-1, layer=20, head=None, model_name='gpt2-medium', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x119597d80>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2-medium
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-2, layer=32, head=None, model_name='gpt2-medium', device='cpu')
+and target:
+TargetContext(prompt='Q: What happened with Sam and Ricky? A: Sam didn’t pass Ricky. Q: What happened with Cory and Harvey? A: Cory didn’t pass Harvey. Q: What happened with Alex and Charlie? A:', position=-1, layer=32, head=None, model_name='gpt2-medium', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x119597d80>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2-medium
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-2, layer=12, head=None, model_name='gpt2-medium', device='cpu')
+and target:
+TargetContext(prompt='Q: What happened with Sam and Ricky? A: Sam didn’t pass Ricky. Q: What happened with Cory and Harvey? A: Cory didn’t pass Harvey. Q: What happened with Alex and Charlie? A:', position=-1, layer=12, head=None, model_name='gpt2-medium', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x15a197d80>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2-medium
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-2, layer=22, head=None, model_name='gpt2-medium', device='cpu')
+and target:
+TargetContext(prompt='Q: What happened with Sam and Ricky? A: Sam didn’t pass Ricky. Q: What happened with Cory and Harvey? A: Cory didn’t pass Harvey. Q: What happened with Alex and Charlie? A:', position=-1, layer=22, head=None, model_name='gpt2-medium', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x15a197d80>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2-medium
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-2, layer=22, head=None, model_name='gpt2-medium', device='cpu')
+and target:
+TargetContext(prompt='Q: What happened with Sam and Ricky? A: Sam didn’t pass Ricky. Q: What happened with Cory and Harvey? A: Cory didn’t pass Harvey. Q: What happened with Alex and Charlie? A:', position=-1, layer=22, head=None, model_name='gpt2-medium', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x141297d80>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2-medium
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-2, layer=32, head=None, model_name='gpt2-medium', device='cpu')
+and target:
+TargetContext(prompt='Q: What happened with Sam and Ricky? A: Sam didn’t pass Ricky. Q: What happened with Cory and Harvey? A: Cory didn’t pass Harvey. Q: What happened with Alex and Charlie? A:', position=-1, layer=32, head=None, model_name='gpt2-medium', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x141297d80>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2-medium
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-2, layer=22, head=None, model_name='gpt2-medium', device='cpu')
+and target:
+TargetContext(prompt='Q: What happened with Sam and Ricky? A: Sam didn’t pass Ricky. Q: What happened with Cory and Harvey? A: Cory didn’t pass Harvey. Q: What happened with Alex and Charlie? A:', position=-1, layer=22, head=None, model_name='gpt2-medium', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x11dc97d80>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2-medium
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-2, layer=29, head=None, model_name='gpt2-medium', device='cpu')
+and target:
+TargetContext(prompt='Q: What happened with Sam and Ricky? A: Sam didn’t pass Ricky. Q: What happened with Cory and Harvey? A: Cory didn’t pass Harvey. Q: What happened with Alex and Charlie? A:', position=-1, layer=29, head=None, model_name='gpt2-medium', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x11dc97d80>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2-medium
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-2, layer=12, head=None, model_name='gpt2-medium', device='cpu')
+and target:
+TargetContext(prompt='Q: What happened with Sam and Ricky? A: Sam didn’t pass Ricky. Q: What happened with Cory and Harvey? A: Cory didn’t pass Harvey. Q: What happened with Alex and Charlie? A:', position=-1, layer=12, head=None, model_name='gpt2-medium', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x129297d80>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2-medium
+Patchscope initialize with source:
+SourceContext(prompt='Alex passed Bo, but not Charlie.', position=-2, layer=22, head=None, model_name='gpt2-medium', device='cpu')
+and target:
+TargetContext(prompt='Q: What happened with Sam and Ricky? A: Sam didn’t pass Ricky. Q: What happened with Cory and Harvey? A: Cory didn’t pass Harvey. Q: What happened with Alex and Charlie? A:', position=-1, layer=22, head=None, model_name='gpt2-medium', device='cpu', mapping_function=<function TargetContext.<lambda> at 0x129297d80>, max_new_tokens=10)
+Loading NNsight LanguagModel: gpt2-medium
