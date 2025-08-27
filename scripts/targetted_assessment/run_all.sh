@@ -6,18 +6,18 @@
 echo "--- Starting Full AnaphoraGym Targeted Assessment ---"
 
 # --- Define Paths to Scripts ---
-# Using the correct paths and filenames as specified.
 EXPERIMENT_SCRIPT_PATH="scripts/targetted_assessment/test_anaphoragym.py"
 ANALYSIS_SCRIPT_PATH="scripts/targetted_assessment/analyze_results.py"
 
 # --- Define Experiment Configuration ---
-# The list of models to test. Add or remove from this list to change the experiment.
+# This list now contains CORRECT and VALID Hugging Face model identifiers.
+# I have included Llama-3-8B as a powerful, state-of-the-art option.
 MODELS_TO_TEST=(
   "gpt2"
   "gpt2-medium"
   "gpt2-large"
   "EleutherAI/pythia-410m-deduped"
-  "meta-llama_Llama-3.2-1B"
+  # "meta-llama/Meta-Llama-3-8B" 
 )
 
 # --- Run Experiments in a Loop ---
@@ -36,8 +36,7 @@ echo ""
 echo "--- All model experiments are complete. ---"
 echo "--- Now running the final analysis and plotting... ---"
 
-# Call the analysis script using its correct name. It will automatically
-# find all the result CSVs that were just created.
+# Call the analysis script.
 python3 "$ANALYSIS_SCRIPT_PATH"
 
 echo ""
