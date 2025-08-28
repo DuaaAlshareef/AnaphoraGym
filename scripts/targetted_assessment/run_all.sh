@@ -29,7 +29,7 @@ MODELS_TO_TEST=(
   "gpt2-medium"
   "gpt2-large"
   "EleutherAI/pythia-410m-deduped"
-  # "meta-llama/Meta-Llama-3-8B" 
+  "meta-llama/Meta-Llama-3-8B" 
 )
 
 # --- Run Experiments in a Loop ---

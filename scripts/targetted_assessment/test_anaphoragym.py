@@ -13,6 +13,11 @@ import torch.nn.functional as F
 import re
 import argparse
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+os.environ['HUGGINGFACE_API_TOKEN'] = os.getenv('HUGGINGFACE_API_TOKEN')
+                                                
 
 # --- 1. DEFINE PROJECT PATHS ---
 # This block uses the provided logic to make the script robust.
