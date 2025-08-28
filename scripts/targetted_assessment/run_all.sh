@@ -1,4 +1,14 @@
 #!/bin/bash
+#SBATCH --partition=cpu-single
+#SBATCH --tasks=1
+#SBATCH --time=00:02:00
+#SBATCH --mem=2gb
+
+module load devel/miniforge
+conda activate anaphoragym_env
+echo $(which python)
+
+
 
 # This script orchestrates the entire targeted assessment pipeline.
 # It should be run from the project's root directory.
