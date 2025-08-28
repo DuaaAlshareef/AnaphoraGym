@@ -1,8 +1,10 @@
 #!/bin/bash
-#SBATCH --partition=cpu-single
+#SBATCH --partition=gpu-single
 #SBATCH --tasks=1
-#SBATCH --time=00:02:00
+#SBATCH --time=00:05:00
 #SBATCH --mem=2gb
+#SBATCH --gres=gpu:A40:1
+
 
 module load devel/miniforge
 conda activate anaphoragym_env

@@ -16,8 +16,8 @@
 import numpy as np
 import torch
 import tqdm
-from scripts.mechanistic_analysis.general_utils import decode_tokens
-from scripts.mechanistic_analysis.general_utils import make_inputs
+from general_utils import decode_tokens
+from general_utils import make_inputs
 
 
 # ##############

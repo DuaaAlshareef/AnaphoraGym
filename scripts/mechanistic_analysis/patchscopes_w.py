@@ -1,17 +1,10 @@
 # # ==============================================================================
-# # FINAL SCRIPT - GENERATIVE PATCHING (CORRECTED WITH PRE-HOOK)
+# # SCRIPT - GENERATIVE PATCHING (CORRECTED WITH PRE-HOOK)
 
 # # This version uses a `register_forward_pre_hook` to ensure the patch
 # # is applied correctly *before* the layer's computation, fixing the issue
 # # of the patch having no effect during generation.
 # # ==============================================================================
-
-
-
-
-
-
-
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -21,19 +14,22 @@ import pandas as pd
 MODEL_NAME = "meta-llama/Llama-3.2-1B"
 # SOURCE_SENTENCE = "I am so sad, I am so sad, I am so sad."
 
-PRIMING_PREFIX = ""
-EVENT_SENTENCE = "Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie."
-SOURCE_SENTENCE = PRIMING_PREFIX + EVENT_SENTENCE
-# SOURCE_SENTENCE = "Alex passed Bo, but not Charlie."
+# PRIMING_PREFIX = ""
+# EVENT_SENTENCE = "Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie."
+# SOURCE_SENTENCE = PRIMING_PREFIX + EVENT_SENTENCE
+SOURCE_SENTENCE = "Alex passed Bo, but not Charlie."
 # SOURCE_SENTENCE = "Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie."
 # SOURCE_SENTENCE = "Alex and Charlie. Alex and Charlie. Alex and Charlie. "
 # PATCHING_PROMPT = "Cory and Harvey; Kim and Taylor; Alex and "
 PATCHING_PROMPT = "word:word ; door:door; 1:1; first:first; cat:cat; ?"
 # PATCHING_PROMPT = "Sam didn’t pass Ricky that is to say Cory didn’t pass Harvey that is to say Kim didn’t pass Taylor that is to say "
+
+
 # --- Dynamic Layer Selection ---
 print(f"Loading model: {MODEL_NAME}...")
 if torch.backends.mps.is_available(): device = torch.device("mps")
 else: device = torch.device("cpu")
+
 model = AutoModelForCausalLM.from_pretrained(MODEL_NAME).to(device)
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 tokenizer.pad_token = tokenizer.eos_token

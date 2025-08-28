@@ -9,8 +9,8 @@ import torch
 import pandas as pd
 
 # --- 1. Import from the local utility files ---
-from scripts.mechanistic_analysis.general_utils import ModelAndTokenizer
-from scripts.mechanistic_analysis.patchscopes_utils import inspect, set_hs_patch_hooks_gptj, set_hs_patch_hooks_llama
+from general_utils import ModelAndTokenizer
+from patchscopes_utils import inspect, set_hs_patch_hooks_gptj, set_hs_patch_hooks_llama
 
 # --- 2. Configuration ---
 MODEL_NAME = "meta-llama/Llama-3.2-1B"
@@ -18,7 +18,7 @@ MODEL_NAME = "meta-llama/Llama-3.2-1B"
 # SOURCE_SENTENCE = "Alex passed Bo, but not Charlie."
 SOURCE_SENTENCE = "I am so sad, I am so sad, I am so sad."
 # PATCHING_PROMPT = "Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; ?"
-PATCHING_PROMPT = "word:word ; door:door; 1:1; first:first; cat:cat; emotion:?"
+PATCHING_PROMPT = "word:word ; door:door; 1:1; first:first; cat:cat; ?"
 
 LAYERS_TO_TEST = [6, 15]
 
