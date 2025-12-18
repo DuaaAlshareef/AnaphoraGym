@@ -46,29 +46,31 @@ This project uses Python 3.11+. The required libraries are listed in `requiremen
 
 The entire behavioral assessment pipeline can be run with a single command from the project's root directory.
 
-1.  **Configure the experiment:** Open the `run_all.sh` script and edit the `MODELS_TO_TEST` array to include the Hugging Face model identifiers you wish to evaluate.
+1.  **Configure the experiment:** Open `scripts/targeted_assessment/run_all.sh` and edit the `MODELS_TO_TEST` array to include the Hugging Face model identifiers you wish to evaluate.
 
 2.  **Make the script executable (only once):**
     ```bash
-    chmod +x run_all.sh
+    chmod +x scripts/targeted_assessment/run_all.sh
     ```
 
 3.  **Run the full pipeline:**
     ```bash
-    ./run_all.sh
+    bash scripts/targeted_assessment/run_all.sh
     ```
 
-This will execute the `test_anaphoragym.py` script for each model, saving the results in the `results/targetted_assessment/` directory. It will then automatically run `analyze_results.py` to generate a summary table and a comparative performance chart in the `images/` directory.
+This will execute the `run_experiment.py` script for each model, saving the results in the `results/targeted_assessment/` directory. It will then automatically run `aggregate_results.py` to generate a summary table and a comparative performance chart in the `images/` directory.
+
+For more details on the module structure, see `scripts/targeted_assessment/README.md`.
 
 ### Running the Mechanistic (Patchscopes) Analysis
 
 The Patchscopes scripts are designed for more targeted, single-model investigations.
 
-1.  **Configure the script:** Open `scripts/2_mechanistic_analysis/run_patchscopes.py`.
+1.  **Configure the script:** Open `scripts/mechanistic_analysis/run_patchscopes_analysis.sh`.
 2.  **Set the `MODEL_NAME`** and other experimental parameters (e.g., `SOURCE_SENTENCE`, `PATCHING_PROMPT`).
 3.  **Run the script:**
     ```bash
-    python3 scripts/2_mechanistic_analysis/run_patchscopes.py
+    bash scripts/mechanistic_analysis/run_patchscopes_analysis.sh
     ```
 This will print the readout results to the console and save a corresponding CSV file in the `results/mechanistic_analysis/` folder.
 
