@@ -1,160 +1,313 @@
-# # ==============================================================================
-# # SCRIPT - GENERATIVE PATCHING (CORRECTED WITH PRE-HOOK)
+# # # ==============================================================================
+# # # SCRIPT - GENERATIVE PATCHING (CORRECTED WITH PRE-HOOK)
 
-# # This version uses a `register_forward_pre_hook` to ensure the patch
-# # is applied correctly *before* the layer's computation, fixing the issue
-# # of the patch having no effect during generation.
+# # # This version uses a `register_forward_pre_hook` to ensure the patch
+# # # is applied correctly *before* the layer's computation, fixing the issue
+# # # of the patch having no effect during generation.
+# # # ==============================================================================
+
+# import torch
+# from transformers import AutoModelForCausalLM, AutoTokenizer
+# import pandas as pd
+
+# # --- 1. SETUP ---
+# MODEL_NAME = "meta-llama/Llama-3.2-1B"
+# # SOURCE_SENTENCE = "I am so sad, I am so sad, I am so sad.
+# # PRIMING_PREFIX = ""
+# # EVENT_SENTENCE = "Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie."
+# # SOURCE_SENTENCE = PRIMING_PREFIX + EVENT_SENTENCE
+# SOURCE_SENTENCE = "Alex passed Bo, but not Charlie."
+# # SOURCE_SENTENCE = "Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie."
+# # SOURCE_SENTENCE = "Alex and Charlie. Alex and Charlie. Alex and Charlie. "
+# # PATCHING_PROMPT = "Cory and Harvey; Kim and Taylor; Alex and "
+# # PATCHING_PROMPT = "word:word ; door:door; 1:1; first:first; cat:cat; ?"
+# PATCHING_PROMPT = "Sam didn’t pass Ricky that is to say Cory didn’t pass Harvey that is to say Kim didn’t pass Taylor that is to say "
+
+
+# # --- Dynamic Layer Selection ---
+# print(f"Loading model: {MODEL_NAME}...")
+# if torch.backends.mps.is_available(): device = torch.device("mps")
+# else: device = torch.device("cpu")
+
+# model = AutoModelForCausalLM.from_pretrained(MODEL_NAME).to(device)
+# tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+# tokenizer.pad_token = tokenizer.eos_token
+# model.eval()
+# print("Model loaded.")
+
+# num_layers = model.config.num_hidden_layers
+# print(f"Detected {num_layers} layers in this model.")
+# middle_layer = num_layers // 2
+# late_layer = max(0, num_layers - 2)
+# LAYERS_TO_TEST = [middle_layer, late_layer]
+# print(f"Will be testing layers: {LAYERS_TO_TEST}")
+
+# # --- 2. THE PATCHING MECHANISM (REVISED WITH PRE-HOOK) ---
+# activation_storage = {}
+
+# # This is a standard forward hook, used only for copying. It works fine.
+# def copy_hook(module, args, output):
+#     hidden_states = output[0]
+#     vector_to_copy = hidden_states[0, activation_storage['source_idx'], :].clone().cpu()
+#     activation_storage['vector'] = vector_to_copy
+
+# # This is our new PRE-HOOK for patching. It modifies the INPUT `args` to the layer.
+# def patch_pre_hook(module, args):
+#     # The hidden states are the first element in the input tuple `args`.
+#     hidden_states = args[0]
+    
+#     # We only want to patch the initial prompt, not subsequent generated tokens.
+#     if hidden_states.shape[1] == activation_storage['target_len']:
+#         print(f"  -> PRE-HOOK: Patching activation at Layer {activation_storage['layer_num']}")
+#         hidden_states[0, activation_storage['target_idx'], :] = activation_storage['vector'].to(hidden_states.device)
+    
+#     # Return the modified arguments as a tuple
+#     return (hidden_states,) + args[1:]
+
+
+# # --- 3. THE PIPELINE ---
+# results = []
+# stop_token_id = tokenizer.encode("\n")[0]
+# source_ids = tokenizer.encode(SOURCE_SENTENCE, return_tensors='pt').to(device)
+# target_ids = tokenizer.encode(PATCHING_PROMPT, return_tensors='pt').to(device)
+# activation_storage['source_idx'] = -3
+# activation_storage['target_idx'] = -1 
+# activation_storage['target_len'] = target_ids.shape[1]
+
 # # ==============================================================================
+# # TOKENIZATION ANALYSIS BLOCK
+# # This section will print a clear breakdown of the tokenization for verification.
+# # ==============================================================================
+# print("\n--- Tokenization Analysis ---")
+
+# # --- 1. Analyze the Source Sentence ---
+# source_tokens = tokenizer.tokenize(SOURCE_SENTENCE)
+# source_idx_to_check = -3 # The index we intend to copy from
+
+# print(f"Source Sentence: '{SOURCE_SENTENCE}'")
+# print(f"Tokenized Source ({len(source_tokens)} tokens): {source_tokens}")
+
+# # Use a try-except block to safely access the index
+# try:
+#     selected_source_token = source_tokens[source_idx_to_check]
+#     print(f" -> Index {source_idx_to_check} corresponds to token: '{selected_source_token}'")
+# except IndexError:
+#     print(f"[ERROR] Source sentence is too short. Index {source_idx_to_check} is out of bounds.")
+#     # You might want to exit() here if this is critical
+    
+# # --- 2. Analyze the Target (Patching) Prompt ---
+# target_tokens = tokenizer.tokenize(PATCHING_PROMPT)
+# target_idx_to_check = -1 # The index we intend to patch at
+
+# print(f"\nTarget Prompt: '{PATCHING_PROMPT}'")
+# print(f"Tokenized Target ({len(target_tokens)} tokens): {target_tokens}")
+
+# try:
+#     selected_target_token = target_tokens[target_idx_to_check]
+#     print(f" -> Index {target_idx_to_check} corresponds to token: '{selected_target_token}'")
+# except IndexError:
+#     print(f"[ERROR] Target prompt is too short. Index {target_idx_to_check} is out of bounds.")
+#     # You might want to exit() here
+
+# # Add a separator before the main experiment starts
+# print("\n" + "="*70)
+# # ==============================================================================
+
+
+# for layer_num in LAYERS_TO_TEST:
+#     print(f"\n=============================================================")
+#     print(f"=> TESTING PATCH FROM LAYER: {layer_num}")
+#     print(f"=============================================================")
+
+#     # Determine the correct path to the layers
+#     if "Llama" in model.config.architectures[0]:
+#         layer_to_hook = model.model.layers[layer_num]
+#     else:
+#         layer_to_hook = model.transformer.h[layer_num]
+
+#     activation_storage['layer_num'] = layer_num
+
+#     # --- Run 1: Source Run (Copy) ---
+#     copy_hook_handle = layer_to_hook.register_forward_hook(copy_hook)
+#     with torch.no_grad():
+#         model(source_ids, output_hidden_states=True)
+#     copy_hook_handle.remove()
+
+#     # --- Run 2: Patched Generation ---
+#     # We now register the PRE-HOOK for patching.
+#     patch_hook_handle = layer_to_hook.register_forward_pre_hook(patch_pre_hook)
+#     with torch.no_grad():
+#         patched_generated_ids = model.generate(
+#             target_ids, # We pass the full prompt now
+#             max_new_tokens=15,
+#             pad_token_id=tokenizer.eos_token_id,
+#             do_sample=False,
+#             eos_token_id=stop_token_id
+#         )
+#     patch_hook_handle.remove()
+
+#     readout = tokenizer.decode(patched_generated_ids[0][target_ids.shape[1]:], skip_special_tokens=True)
+#     print(f"\n  Readout from Layer {layer_num}: > '{readout.strip()}'")
+#     results.append({'layer': layer_num, 'readout': readout.strip()})
+
+# # --- 4. FINAL SUMMARY ---
+# print("\n\n--- FINAL SUMMARY ---")
+# results_df = pd.DataFrame(results)
+# print(results_df)
+
+
+
+
+
+# ==============================================================================
+# FINAL SCRIPT - GENERATIVE PATCHING FROM MHSA (LLAMA VERSION)
+#
+# This version is correctly configured for `meta-llama/Llama-3.2-1B` and
+# patches the output of the self-attention block (MHSA) to perform a
+# precise causal intervention.
+# ==============================================================================
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import pandas as pd
+import argparse
 
 # --- 1. SETUP ---
-MODEL_NAME = "meta-llama/Llama-3.2-1B"
-# SOURCE_SENTENCE = "I am so sad, I am so sad, I am so sad."
+# MODEL_NAME is now a variable that will be passed in from the command line.
 
-# PRIMING_PREFIX = ""
-# EVENT_SENTENCE = "Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie."
-# SOURCE_SENTENCE = PRIMING_PREFIX + EVENT_SENTENCE
-SOURCE_SENTENCE = "Alex passed Bo, but not Charlie."
-# SOURCE_SENTENCE = "Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie."
-# SOURCE_SENTENCE = "Alex and Charlie. Alex and Charlie. Alex and Charlie. "
-# PATCHING_PROMPT = "Cory and Harvey; Kim and Taylor; Alex and "
-PATCHING_PROMPT = "word:word ; door:door; 1:1; first:first; cat:cat; ?"
-# PATCHING_PROMPT = "Sam didn’t pass Ricky that is to say Cory didn’t pass Harvey that is to say Kim didn’t pass Taylor that is to say "
+def main(model_name):
+    SOURCE_SENTENCE = "Alex passed Bo, but not Charlie."
+    PATCHING_PROMPT = "Sam didn’t pass Ricky; Cory didn’t pass Harvey; Kim didn’t pass Taylor; ?"
+    # SOURCE_SENTENCE = "I am so sad, I am so sad, I am so sad."
+    # # PRIMING_PREFIX = ""
+    # # EVENT_SENTENCE = "Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie."
+    # # SOURCE_SENTENCE = PRIMING_PREFIX + EVENT_SENTENCE
+    # SOURCE_SENTENCE = "Alex passed Bo, but not Charlie."
+    # SOURCE_SENTENCE = "Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie. Alex passed Bo, but not Charlie."
+    # # SOURCE_SENTENCE = "Alex and Charlie. Alex and Charlie. Alex and Charlie. "
+    # # PATCHING_PROMPT = "Cory and Harvey; Kim and Taylor; Alex and "
+    # PATCHING_PROMPT = "word:word ; door:door; 1:1; first:first; cat:cat; ?"
+    # PATCHING_PROMPT = "Sam didn’t pass Ricky that is to say Cory didn’t pass Harvey that is to say Kim didn’t pass Taylor that is to say "
 
-
-# --- Dynamic Layer Selection ---
-print(f"Loading model: {MODEL_NAME}...")
-if torch.backends.mps.is_available(): device = torch.device("mps")
-else: device = torch.device("cpu")
-
-model = AutoModelForCausalLM.from_pretrained(MODEL_NAME).to(device)
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-tokenizer.pad_token = tokenizer.eos_token
-model.eval()
-print("Model loaded.")
-
-num_layers = model.config.num_hidden_layers
-print(f"Detected {num_layers} layers in this model.")
-middle_layer = num_layers // 2
-late_layer = max(0, num_layers - 2)
-LAYERS_TO_TEST = [middle_layer, late_layer]
-print(f"Will be testing layers: {LAYERS_TO_TEST}")
-
-# --- 2. THE PATCHING MECHANISM (REVISED WITH PRE-HOOK) ---
-activation_storage = {}
-
-# This is a standard forward hook, used only for copying. It works fine.
-def copy_hook(module, args, output):
-    hidden_states = output[0]
-    vector_to_copy = hidden_states[0, activation_storage['source_idx'], :].clone().cpu()
-    activation_storage['vector'] = vector_to_copy
-
-# This is our new PRE-HOOK for patching. It modifies the INPUT `args` to the layer.
-def patch_pre_hook(module, args):
-    # The hidden states are the first element in the input tuple `args`.
-    hidden_states = args[0]
+    # --- Model and device loading ---
+    print(f"Loading model: {model_name}...")
+    is_large_model = any(k in model_name for k in ["1B", "6b", "7b", "8b", "12b", "13b"])
     
-    # We only want to patch the initial prompt, not subsequent generated tokens.
-    if hidden_states.shape[1] == activation_storage['target_len']:
-        print(f"  -> PRE-HOOK: Patching activation at Layer {activation_storage['layer_num']}")
-        hidden_states[0, activation_storage['target_idx'], :] = activation_storage['vector'].to(hidden_states.device)
-    
-    # Return the modified arguments as a tuple
-    return (hidden_states,) + args[1:]
-
-
-# --- 3. THE PIPELINE ---
-results = []
-stop_token_id = tokenizer.encode("\n")[0]
-source_ids = tokenizer.encode(SOURCE_SENTENCE, return_tensors='pt').to(device)
-target_ids = tokenizer.encode(PATCHING_PROMPT, return_tensors='pt').to(device)
-activation_storage['source_idx'] = -3
-activation_storage['target_idx'] = -1 
-activation_storage['target_len'] = target_ids.shape[1]
-
-# ==============================================================================
-# TOKENIZATION ANALYSIS BLOCK
-# This section will print a clear breakdown of the tokenization for verification.
-# ==============================================================================
-print("\n--- Tokenization Analysis ---")
-
-# --- 1. Analyze the Source Sentence ---
-source_tokens = tokenizer.tokenize(SOURCE_SENTENCE)
-source_idx_to_check = -3 # The index we intend to copy from
-
-print(f"Source Sentence: '{SOURCE_SENTENCE}'")
-print(f"Tokenized Source ({len(source_tokens)} tokens): {source_tokens}")
-
-# Use a try-except block to safely access the index
-try:
-    selected_source_token = source_tokens[source_idx_to_check]
-    print(f" -> Index {source_idx_to_check} corresponds to token: '{selected_source_token}'")
-except IndexError:
-    print(f"[ERROR] Source sentence is too short. Index {source_idx_to_check} is out of bounds.")
-    # You might want to exit() here if this is critical
-    
-# --- 2. Analyze the Target (Patching) Prompt ---
-target_tokens = tokenizer.tokenize(PATCHING_PROMPT)
-target_idx_to_check = -1 # The index we intend to patch at
-
-print(f"\nTarget Prompt: '{PATCHING_PROMPT}'")
-print(f"Tokenized Target ({len(target_tokens)} tokens): {target_tokens}")
-
-try:
-    selected_target_token = target_tokens[target_idx_to_check]
-    print(f" -> Index {target_idx_to_check} corresponds to token: '{selected_target_token}'")
-except IndexError:
-    print(f"[ERROR] Target prompt is too short. Index {target_idx_to_check} is out of bounds.")
-    # You might want to exit() here
-
-# Add a separator before the main experiment starts
-print("\n" + "="*70)
-# ==============================================================================
-
-
-for layer_num in LAYERS_TO_TEST:
-    print(f"\n=============================================================")
-    print(f"=> TESTING PATCH FROM LAYER: {layer_num}")
-    print(f"=============================================================")
-
-    # Determine the correct path to the layers
-    if "Llama" in model.config.architectures[0]:
-        layer_to_hook = model.model.layers[layer_num]
+    if torch.cuda.is_available() and is_large_model:
+        print("CUDA found. Loading large model in 8-bit mode.")
+        model = AutoModelForCausalLM.from_pretrained(model_name, load_in_8bit=True, device_map="auto")
     else:
-        layer_to_hook = model.transformer.h[layer_num]
+        if torch.backends.mps.is_available(): device = torch.device("mps")
+        else: device = torch.device("cpu")
+        print(f"Using device: {device}. Loading model in full precision.")
+        model = AutoModelForCausalLM.from_pretrained(model_name).to(device)
 
-    activation_storage['layer_num'] = layer_num
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenizer.pad_token = tokenizer.eos_token
+    model.eval()
+    print("Model loaded.")
 
-    # --- Run 1: Source Run (Copy) ---
-    copy_hook_handle = layer_to_hook.register_forward_hook(copy_hook)
-    with torch.no_grad():
-        model(source_ids, output_hidden_states=True)
-    copy_hook_handle.remove()
+    # --- Dynamic Layer Selection ---
+    num_layers = model.config.num_hidden_layers
+    print(f"Detected {num_layers} layers in this model.")
+    middle_layer = num_layers // 2
+    late_layer = max(0, num_layers - 2)
+    LAYERS_TO_TEST = [middle_layer, late_layer]
+    print(f"Will be testing layers: {LAYERS_TO_TEST}")
 
-    # --- Run 2: Patched Generation ---
-    # We now register the PRE-HOOK for patching.
-    patch_hook_handle = layer_to_hook.register_forward_pre_hook(patch_pre_hook)
-    with torch.no_grad():
-        patched_generated_ids = model.generate(
-            target_ids, # We pass the full prompt now
-            max_new_tokens=15,
-            pad_token_id=tokenizer.eos_token_id,
-            do_sample=False,
-            eos_token_id=stop_token_id
-        )
-    patch_hook_handle.remove()
+    # --- 2. THE PATCHING MECHANISM (ADAPTED FOR MHSA) ---
+    activation_storage = {}
 
-    readout = tokenizer.decode(patched_generated_ids[0][target_ids.shape[1]:], skip_special_tokens=True)
-    print(f"\n  Readout from Layer {layer_num}: > '{readout.strip()}'")
-    results.append({'layer': layer_num, 'readout': readout.strip()})
+    def copy_attn_hook(module, args, output):
+        attention_output_states = output[0]
+        if attention_output_states.dim() == 3:
+            vector_to_copy = attention_output_states[0, activation_storage['source_idx'], :].clone().cpu()
+        elif attention_output_states.dim() == 2:
+            vector_to_copy = attention_output_states[activation_storage['source_idx'], :].clone().cpu()
+        else:
+            raise ValueError(f"Unexpected attention output dimension: {attention_output_states.dim()}")
+        activation_storage['vector'] = vector_to_copy
 
-# --- 4. FINAL SUMMARY ---
-print("\n\n--- FINAL SUMMARY ---")
-results_df = pd.DataFrame(results)
-print(results_df)
+    def patch_pre_ffn_hook(module, args):
+        hidden_states = args[0]
+        if hidden_states.shape[1] == activation_storage['target_len']:
+            print(f"  -> PRE-FFN-HOOK: Patching state at Layer {activation_storage['layer_num']}")
+            hidden_states[0, activation_storage['target_idx'], :] += activation_storage['vector'].to(hidden_states.device)
+        return (hidden_states,)
+
+    # --- 3. THE PIPELINE ---
+    results = []
+    stop_token_id = tokenizer.encode("\n")[0]
+    source_ids = tokenizer.encode(SOURCE_SENTENCE, return_tensors='pt').to(model.device)
+    target_ids = tokenizer.encode(PATCHING_PROMPT, return_tensors='pt').to(model.device)
+    activation_storage['source_idx'] = -2
+    activation_storage['target_idx'] = -1
+    activation_storage['target_len'] = target_ids.shape[1]
+
+    for layer_num in LAYERS_TO_TEST:
+        print(f"\n=============================================================")
+        print(f"=> TESTING MHSA PATCH FROM LAYER: {layer_num}")
+        print(f"=============================================================")
+
+        model_arch = model.config.architectures[0]
+        if "Llama" in model_arch:
+            copy_layer_module = model.model.layers[layer_num].self_attn
+            patch_layer_module = model.model.layers[layer_num].post_attention_layernorm
+        elif "GPTJ" in model_arch or "GPT2" in model_arch:
+            copy_layer_module = model.transformer.h[layer_num].attn
+            patch_layer_module = model.transformer.h[layer_num].ln_2
+        elif "GPTNeoX" in model_arch:
+            copy_layer_module = model.gpt_neox.layers[layer_num].attention
+            patch_layer_module = model.gpt_neox.layers[layer_num].post_attention_layernorm
+        else:
+            print(f"[ERROR] Unsupported model architecture for MHSA patching: {model_arch}")
+            continue
+
+        activation_storage['layer_num'] = layer_num
+
+        # --- Run 1: Source Run (Copy the ATTENTION output) ---
+        copy_hook_handle = copy_layer_module.register_forward_hook(copy_attn_hook)
+        with torch.no_grad():
+            model(source_ids, output_hidden_states=True)
+        copy_hook_handle.remove()
+
+        # --- Run 2: Patched Generation (Patch BEFORE the FFN) ---
+        patch_hook_handle = patch_layer_module.register_forward_pre_hook(patch_pre_ffn_hook)
+        with torch.no_grad():
+            patched_generated_ids = model.generate(
+                target_ids,
+                max_new_tokens=15,
+                pad_token_id=tokenizer.eos_token_id,
+                do_sample=False,
+                eos_token_id=stop_token_id
+            )
+        patch_hook_handle.remove()
+
+        readout = tokenizer.decode(patched_generated_ids[0][target_ids.shape[1]:], skip_special_tokens=True)
+        print(f"\n  Readout from Layer {layer_num} MHSA: > '{readout.strip()}'")
+        results.append({
+            'model_name': model_name,
+            'layer': layer_num,
+            'readout': readout.strip() if readout.strip() else "[NO NEW TEXT GENERATED]"
+        })
+
+    # --- 4. FINAL SUMMARY ---
+    print("\n\n--- FINAL SUMMARY ---")
+    results_df = pd.DataFrame(results)
+    print(results_df)
+    
+    # Save the results to a CSV file
+    safe_model_name = model_name.replace('/', '_')
+    output_filename = f"MHSA_Patch_Readouts_{safe_model_name}.csv"
+    results_df.to_csv(output_filename, index=False)
+    print(f"\nResults saved to '{output_filename}'")
 
 
-
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run MHSA Patchscopes analysis for a specific language model.")
+    parser.add_argument(
+        "--model", type=str, default="meta-llama/Llama-2-13b-hf",
+        help="The name of the Hugging Face model to test."
+    )
+    args = parser.parse_args()
+    main(model_name=args.model)

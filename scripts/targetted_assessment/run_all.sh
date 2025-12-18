@@ -1,55 +1,99 @@
 #!/bin/bash
 #SBATCH --partition=gpu-single
 #SBATCH --tasks=1
-#SBATCH --time=00:05:00
-#SBATCH --mem=2gb
-#SBATCH --gres=gpu:A40:1
+#SBATCH --time=02:00:00
+#SBATCH --mem=200gb
+#SBATCH --gres=gpu:A100:1
 
 
 module load devel/miniforge
-conda activate anaphoragym_env
+conda activate virtual_env
 echo $(which python)
-
-
 
 # This script orchestrates the entire targeted assessment pipeline.
 # It should be run from the project's root directory.
 
 echo "--- Starting Full AnaphoraGym Targeted Assessment ---"
-
 # --- Define Paths to Scripts ---
+
 EXPERIMENT_SCRIPT_PATH="scripts/targetted_assessment/test_anaphoragym.py"
-ANALYSIS_SCRIPT_PATH="scripts/targetted_assessment/analyze_results.py"
+ANALYZE_RESULTS_PATH="scripts/targetted_assessment/count_tests.py"
+CREATE_ENRICHED_DATASET_PATH="scripts/targetted_assessment/concatenate_outputs.py"
+COMPARE_TYPES_PATH="scripts/targetted_assessment/compare_model_types.py"
+CREATE_FACETED_CHART_PATH="scripts/targetted_assessment/create_faceted_chart.py"
+COMPARE_TUNING_PAIRS_PATH="scripts/targetted_assessment/compare_tuning_pairs.py"
+CREATE_HEATMAP_PATH="scripts/targetted_assessment/create_heatmap.py"
 
-# --- Define Experiment Configuration ---
-# This list now contains CORRECT and VALID Hugging Face model identifiers.
-# I have included Llama-3-8B as a powerful, state-of-the-art option.
+# --- Experiment Configuration ---
 MODELS_TO_TEST=(
-  "gpt2"
-  "gpt2-medium"
-  "gpt2-large"
-  "EleutherAI/pythia-410m-deduped"
-  "meta-llama/Meta-Llama-3-8B" 
-)
+  # "gpt2"
+  # "gpt2-medium"
+  # "gpt2-large"
+  # "EleutherAI/pythia-410m-deduped"
+  # "meta-llama/Llama-3.2-1B"
+  # "meta-llama/Llama-2-7b-hf"
+  # "meta-llama/Llama-2-7b-chat-hf"
+  # "meta-llama/Llama-2-13b-hf"
+  # "meta-llama/Llama-3-8B"
+  # "meta-llama/Meta-Llama-3.1-8B-Instruct"
+  # "lmsys/vicuna-7b-v1.5"
+  # "lmsys/vicuna-13b-v1.3"
+  "mistralai/Mistral-7B-Instruct-v0.3"
+  )
 
-# --- Run Experiments in a Loop ---
+# --- 1. Run the Experiments ---
+echo "--- Starting Full AnaphoraGym Targeted Assessment ---"
 for model_name in "${MODELS_TO_TEST[@]}"
 do
   echo ""
   echo "============================================================="
   echo "=> Running experiment for model: $model_name"
   echo "============================================================="
-  
-  # Call the Python script using its full path from the root.
   python3 "$EXPERIMENT_SCRIPT_PATH" --model "$model_name"
 done
 
+# --- 2. Run All Analysis and Plotting Scripts ---
 echo ""
 echo "--- All model experiments are complete. ---"
-echo "--- Now running the final analysis and plotting... ---"
+echo ""
 
-# Call the analysis script.
-python3 "$ANALYSIS_SCRIPT_PATH"
+echo "============================================================="
+echo "=> Running main analysis and creating primary bar chart..."
+echo "============================================================="
+python3 "$ANALYZE_RESULTS_PATH"
 
 echo ""
-echo "--- Pipeline Complete ---"
+echo "============================================================="
+echo "=> Creating the consolidated, enriched dataset CSV..."
+echo "============================================================="
+# python3 "$CREATE_ENRICHED_DATASET_PATH"
+
+# echo ""
+# echo "============================================================="
+# echo "=> Creating the 'Base vs. Instruction-Tuned' comparison chart..."
+# echo "============================================================="
+# python3 "$COMPARE_TYPES_PATH"
+
+# echo ""
+# echo "============================================================="
+# echo "=> Creating the faceted (small multiples) chart..."
+# echo "============================================================="
+# python3 "$CREATE_FACETED_CHART_PATH"
+
+# echo ""
+# echo "============================================================="
+# echo "=> Creating the compare tuned pairs chart..."
+# echo "============================================================="
+
+# python3 "$COMPARE_TUNING_PAIRS_PATH"
+
+
+# echo ""
+# echo "============================================================="
+# echo "=> Creating the heatmap chart..."
+# echo "============================================================="
+
+# python3 "$CREATE_HEATMAP_PATH"
+
+# echo ""
+# echo "--- Pipeline Complete ---"

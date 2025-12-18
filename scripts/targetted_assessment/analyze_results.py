@@ -1,12 +1,11 @@
-
 # ==============================================================================
-# FINAL SCRIPT: AUTOMATIC ANALYSIS AND PLOTTING (CORRECT PATHS)
+# FINAL SCRIPT: AUTOMATIC ANALYSIS AND PLOTTING
 #
-# This script is designed to be run from the `run_all.sh` orchestrator.
-# It automatically finds all result files from the correct directory,
-# creates a summary table, and saves a final, publication-quality chart.
+# PURPOSE:
+# This is the script that creates the 'model_comparison_summary.csv'.
+# It is run only ONCE by the run_all.sh script AFTER all the individual
+# experiments are complete.
 # ==============================================================================
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -15,19 +14,14 @@ import glob
 import os
 
 # --- 1. DEFINE PROJECT PATHS ---
-# This makes the script runnable from anywhere, including the bash script.
 try:
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
     PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..'))
 except NameError:
-    # This fallback is for running in interactive environments like Jupyter
     PROJECT_ROOT = os.path.abspath('.')
 
-# Define the specific directories for results and images
 RESULTS_DIR = os.path.join(PROJECT_ROOT, 'results', 'targetted_assessment')
 IMAGES_DIR = os.path.join(PROJECT_ROOT, 'images')
-
-# Ensure the output directory for images exists
 os.makedirs(IMAGES_DIR, exist_ok=True)
 
 
@@ -61,7 +55,6 @@ def create_comparison_chart(summary_df, model_order):
     cleaned_model_order = [name.replace('_', '/') for name in model_order]
     df_long['model_name'] = pd.Categorical(df_long['model_name'], categories=cleaned_model_order, ordered=True)
     
-    # --- Plotting Setup ---
     plt.style.use('seaborn-v0_8-whitegrid')
     plt.rcParams['font.family'] = 'serif'
     fig, ax = plt.subplots(figsize=(12, 7))
@@ -69,8 +62,7 @@ def create_comparison_chart(summary_df, model_order):
     palette = sns.color_palette('deep', n_colors=len(df_long['model_name'].unique()))
 
     sns.barplot(data=df_long, x='condition', y='accuracy', hue='model_name', ax=ax, palette=palette)
-
-    # --- Customization ---
+    
     ax.set_title('Figure 1: Model Performance on the AnaphoraGym Benchmark', fontsize=16, pad=20, weight='bold', loc='center')
     ax.set_xlabel('Linguistic Condition', fontsize=12, weight='bold')
     ax.set_ylabel('Accuracy (%)', fontsize=12, weight='bold')
@@ -84,7 +76,6 @@ def create_comparison_chart(summary_df, model_order):
     
     plt.tight_layout(rect=[0, 0, 0.88, 1])
 
-    # --- Save the Chart to the correct images folder ---
     output_path = os.path.join(IMAGES_DIR, "model_comparison_chart.png")
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     print(f"\nPublication-quality chart saved to '{output_path}'")
@@ -97,15 +88,19 @@ def main():
         'gpt2-medium': 355,
         'EleutherAI_pythia-410m-deduped': 410,
         'gpt2-large': 774,
-        'meta-llama_Llama-3-8B': 8000
+        'meta-llama_Llama-3.2-1B': 1000, # 1B
+        'lmsys_vicuna-7b-v1.5': 7000,
+        'meta-llama_Llama-2-7b-chat-hf': 7000,
+        'meta-llama_Meta-Llama-3.1-8B-Instruct': 8000,
+        'lmsys_vicuna-13b-v1.3': 13000,
+        'meta-llama_Llama-2-13b-hf': 13000
     }
     
-    # Use the correct path to search for the result files
     search_pattern = os.path.join(RESULTS_DIR, "AnaphoraGym_Results_*.csv")
     result_files = glob.glob(search_pattern)
 
     if not result_files:
-        print(f"Analysis failed: No result files found in '{RESULTS_DIR}'")
+        print(f"Analysis failed: No result files found in '{RESULTS_DIR}'.")
         return
 
     print(f"Found {len(result_files)} result files to compare.")
@@ -136,10 +131,12 @@ def main():
     print("\n--- MODEL PERFORMANCE COMPARISON ---")
     print(final_comparison_table)
     
+    # ================== THIS IS THE LINE THAT CREATES THE FILE ==================
     # Save the summary table to the correct results folder
     summary_path = os.path.join(RESULTS_DIR, "model_comparison_summary.csv")
     final_comparison_table.to_csv(summary_path, index=False)
     print(f"\nComparison summary saved to '{summary_path}'")
+    # ==========================================================================
     
     create_comparison_chart(final_comparison_table, sorted_model_names)
 
