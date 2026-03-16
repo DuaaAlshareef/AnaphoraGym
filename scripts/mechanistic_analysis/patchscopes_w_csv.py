@@ -12,11 +12,21 @@ import pandas as pd
 import os
 
 # --- 1. SETUP ---
+try:
+    _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+    _PROJECT_ROOT = os.path.abspath(os.path.join(_SCRIPT_DIR, '..', '..'))
+except NameError:
+    _PROJECT_ROOT = os.path.abspath('.')
+
+RESULTS_DIR = os.path.join(_PROJECT_ROOT, 'results', 'mechanistic_analysis')
+os.makedirs(RESULTS_DIR, exist_ok=True)
+
+DATASET_FILENAME = os.path.join(_PROJECT_ROOT, 'dataset', 'AnaphoraGym.csv')
+
 MODEL_NAME = "gpt2"
 # We will test a middle and a late layer for every item in the dataset.
 LAYERS_TO_TEST = [6, 11]
-# The script will look for this file in the SAME directory.
-DATASET_FILENAME = "AnaphoraGym.csv"
+# Dataset is loaded from the project dataset/ folder (see DATASET_FILENAME above).
 
 print(f"Loading model: {MODEL_NAME}...")
 # --- Correctly set up the device for your M2 Mac ---
@@ -55,7 +65,7 @@ def main():
         df = pd.read_csv(DATASET_FILENAME)
         print(f"\nSuccessfully loaded '{DATASET_FILENAME}' with {len(df)} items.")
     except FileNotFoundError:
-        print(f"\n[ERROR] Dataset not found. Please make sure '{DATASET_FILENAME}' is in the same directory as this script.")
+        print(f"\n[ERROR] Dataset not found at '{DATASET_FILENAME}'.")
         return
 
     all_results = []
@@ -141,10 +151,11 @@ def main():
     results_df = pd.DataFrame(all_results, columns=column_order)
     
     output_filename = f"AnaphoraGym_Full_Patchscope_Results_{MODEL_NAME}.csv"
-    
+    output_path = os.path.join(RESULTS_DIR, output_filename)
+
     try:
-        results_df.to_csv(output_filename, index=False)
-        print(f"Final report with {len(results_df)} results saved to '{output_filename}'")
+        results_df.to_csv(output_path, index=False)
+        print(f"Final report with {len(results_df)} results saved to '{output_path}'")
     except Exception as e:
         print(f"\n[ERROR] Could not save final report. Reason: {e}")
 

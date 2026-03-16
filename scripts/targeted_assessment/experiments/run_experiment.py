@@ -45,12 +45,19 @@ def calculate_llh(model, tokenizer, input_text, continuation_text):
     
     device = model.device
     
-    # Concatenate input and continuation (no space added - tokenizer handles this)
+    # Concatenate input and continuation
     full_text = input_text + continuation_text
     
-    # Tokenize full text and input separately
-    input_ids = tokenizer.encode(full_text, return_tensors="pt").to(device)
-    input_only_ids = tokenizer.encode(input_text, return_tensors="pt").to(device)
+    # Tokenize WITHOUT special tokens so the boundary index is not corrupted by
+    # BOS/EOS tokens that some tokenizers (e.g. instruct models) inject on every
+    # encode() call. A BOS/EOS mid-sequence from input_text would shift
+    # continuation_start_index by 1 or more, silently measuring the wrong tokens.
+    input_ids = tokenizer.encode(
+        full_text, return_tensors="pt", add_special_tokens=False
+    ).to(device)
+    input_only_ids = tokenizer.encode(
+        input_text, return_tensors="pt", add_special_tokens=False
+    ).to(device)
     
     # Ensure batch dimension
     if input_ids.dim() == 1:
@@ -133,7 +140,9 @@ def run_assessment(model_name: str):
     # Run experiments
     results = []
     for index, row in df.iterrows():
-        print(f"=> Processing Condition: {row['condition']}, Item: {row['item']}")
+        condition = row['condition']
+        sub_cond = row.get('sub_cond', '')  # Get sub_cond if it exists
+        print(f"=> Processing Condition: {condition}, Sub-condition: {sub_cond}, Item: {row['item']}")
         
         for i in range(1, row['n_tests'] + 1):
             test_col_name = f'test_{i}'
@@ -207,6 +216,7 @@ def run_assessment(model_name: str):
             results.append({
                 'model_source': model_name,
                 'condition': row['condition'],
+                'sub_cond': sub_cond,
                 'item': row['item'],
                 'test_name': test_col_name,
                 'test_definition': test_definition,

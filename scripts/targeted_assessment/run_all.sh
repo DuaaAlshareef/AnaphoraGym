@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --partition=gpu-single
 #SBATCH --tasks=1
-#SBATCH --time=02:00:00
-#SBATCH --mem=200gb
-#SBATCH --gres=gpu:A100:1
+#SBATCH --time=01:00:00
+#SBATCH --mem=5gb
+#SBATCH --gres=gpu:A40:1 
 
 module load devel/miniforge
 conda activate virtual_env
@@ -16,6 +16,7 @@ echo "--- Starting Full AnaphoraGym Targeted Assessment ---"
 
 # --- Define Paths to Scripts ---
 EXPERIMENT_SCRIPT_PATH="scripts/targeted_assessment/experiments/run_experiment.py"
+VISUALIZE_SINGLE_MODEL_PATH="scripts/targeted_assessment/visualization/visualize_single_model.py"
 ANALYZE_RESULTS_PATH="scripts/targeted_assessment/analysis/aggregate_results.py"
 CREATE_ENRICHED_DATASET_PATH="scripts/targeted_assessment/data/create_enriched_dataset.py"
 COMPARE_TYPES_PATH="scripts/targeted_assessment/analysis/compare_model_types.py"
@@ -28,6 +29,9 @@ CREATE_COMPARISON_CHARTS_PATH="scripts/targeted_assessment/visualization/create_
 
 # --- Experiment Configuration ---
 MODELS_TO_TEST=(
+  "allenai/OLMo-3-7B-Instruct"
+  # "Qwen/Qwen2.5-3B-Instruct"
+  # "Qwen/Qwen2.5-0.5B-Instruct"
   # "gpt2"
   # "gpt2-medium"
   # "gpt2-large"
@@ -40,7 +44,7 @@ MODELS_TO_TEST=(
   # "meta-llama/Meta-Llama-3.1-8B-Instruct"
   # "lmsys/vicuna-7b-v1.5"
   # "lmsys/vicuna-13b-v1.3"
-  "mistralai/Mistral-7B-Instruct-v0.3"
+  # "mistralai/Mistral-7B-Instruct-v0.3"
   )
 
 # --- 1. Run the Experiments ---
@@ -52,6 +56,10 @@ do
   echo "=> Running experiment for model: $model_name"
   echo "============================================================="
   python3 "$EXPERIMENT_SCRIPT_PATH" --model "$model_name"
+  
+  echo ""
+  echo "=> Creating visualization for $model_name"
+  python3 "$VISUALIZE_SINGLE_MODEL_PATH" --model "$model_name"
 done
 
 # --- 2. Run All Analysis and Plotting Scripts ---

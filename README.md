@@ -42,6 +42,7 @@ Our methodology employs a dual-phase approach:
 - 🎯 **Comprehensive Benchmark**: Systematic evaluation across multiple anaphora resolution conditions
 - 📊 **Behavioral Analysis**: Log-likelihood based assessment framework
 - 🔬 **Mechanistic Interpretability**: Patchscopes-based analysis of model internals
+- 🧠 **Layer-wise Probing**: Identify which transformer layers encode anaphoric information
 - 📈 **Visualization Tools**: Publication-ready charts and comparisons
 - 🧩 **Modular Architecture**: Clean separation of experiments, analysis, and visualization
 - 🔄 **Reproducible**: Well-documented pipeline with shared utilities
@@ -186,11 +187,69 @@ python scripts/targeted_assessment/data/create_enriched_dataset.py
 
 The mechanistic analysis uses Patchscopes to investigate model internal representations.
 
+#### Standard Patchscopes Analysis
+
 ```bash
 # Configure parameters in scripts/mechanistic_analysis/run_patchscopes_analysis.sh
 # Then run:
 bash scripts/mechanistic_analysis/run_patchscopes_analysis.sh
 ```
+
+#### Layer-wise Probing Analysis
+
+**NEW**: Identify which layers of transformer models encode anaphoric information.
+
+**Quick Start:**
+
+```bash
+# Run complete layer probing analysis
+bash scripts/mechanistic_analysis/run_layer_probing.sh
+```
+
+**What it does:**
+- Probes all 32 layers of Llama-2-7b-chat-hf
+- Measures anaphora resolution performance at each layer
+- Identifies which layers encode anaphoric information
+- Creates comprehensive visualizations
+
+**Quick Demo:**
+
+```bash
+# Test with a simple example
+python scripts/mechanistic_analysis/demo_layer_probing.py
+```
+
+**Manual Execution:**
+
+```bash
+# Step 1: Run layer probing
+python scripts/mechanistic_analysis/layer_wise_probing.py \
+    --model "meta-llama/Llama-2-7b-chat-hf" \
+    --dataset "dataset/AnaphoraGym.csv" \
+    --max_samples 10
+
+# Step 2: Create visualizations
+python scripts/mechanistic_analysis/visualize_layer_probing.py \
+    --results_dir "results/mechanistic_analysis/layer_probing" \
+    --output_dir "images/layer_probing"
+```
+
+**Output:**
+- **Statistics**: `results/mechanistic_analysis/layer_probing/layer_statistics.csv`
+- **Detailed results**: `results/mechanistic_analysis/layer_probing/detailed_layer_results.csv`
+- **Visualizations**: `images/layer_probing/`
+  - `layer_performance.png` - 4-panel comprehensive analysis
+  - `layer_trajectory.png` - Gradient visualization of layer evolution
+  - `layer_comparison.png` - Multi-metric comparison
+  - `layer_condition_heatmap.png` - Performance by anaphora condition
+  - `analysis_report.txt` - Detailed text summary
+
+**Key Insights:**
+- Identifies at which depth anaphora resolution occurs (early/middle/late layers)
+- Shows if different anaphora types are processed at different layers
+- Provides mechanistic understanding of model linguistic competence
+
+For detailed documentation, see [`scripts/mechanistic_analysis/LAYER_PROBING_README.md`](scripts/mechanistic_analysis/LAYER_PROBING_README.md).
 
 ## Data Availability
 

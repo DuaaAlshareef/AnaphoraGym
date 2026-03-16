@@ -31,19 +31,8 @@ def get_dataset_path():
 
 
 def get_results_dir():
-    """
-    Get the path to the results directory.
-    
-    Note: Uses 'targeted_assessment' (correct spelling) but will also check
-    for 'targetted_assessment' (old typo) for backward compatibility.
-    """
-    project_root = get_project_root()
-    # Try the correct spelling first
-    results_dir = os.path.join(project_root, 'results', 'targeted_assessment')
-    # Check if old directory exists (for backward compatibility)
-    old_dir = os.path.join(project_root, 'results', 'targetted_assessment')
-    if os.path.exists(old_dir) and not os.path.exists(results_dir):
-        results_dir = old_dir
+    """Get the path to the targeted assessment results directory."""
+    results_dir = os.path.join(get_project_root(), 'results', 'targeted_assessment')
     os.makedirs(results_dir, exist_ok=True)
     return results_dir
 

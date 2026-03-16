@@ -1,0 +1,4 @@
+condition,accuracy_gpt2,accuracy_Qwen_Qwen2.5-3B-Instruct,accuracy_Qwen_Qwen2.5-0.5B-Instruct
+events,65.71,55.24,53.33
+propositional_clefting,63.66,46.99,64.75
+split_reference,49.79,59.29,57.26
