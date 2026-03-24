@@ -91,15 +91,15 @@ Our methodology employs a dual-phase approach:
 ### Run a Single Model Assessment
 
 ```bash
-python scripts/targeted_assessment/experiments/run_experiment.py --model "gpt2"
+python scripts/targetted_assessment/experiments/run_experiment.py --model "gpt2"
 ```
 
 ### Run Full Pipeline
 
 ```bash
-# 1. Configure models in scripts/targeted_assessment/run_all.sh
+# 1. Configure models in scripts/targetted_assessment/run_all.sh
 # 2. Run the complete pipeline
-bash scripts/targeted_assessment/run_all.sh
+bash scripts/targetted_assessment/run_all.sh
 ```
 
 ## Project Structure
@@ -109,7 +109,7 @@ AnaphoraGym/
 ├── dataset/                          # AnaphoraGym benchmark dataset
 │   └── AnaphoraGym.csv
 ├── scripts/
-│   ├── targeted_assessment/         # Behavioral assessment module
+│   ├── targetted_assessment/         # Behavioral assessment module
 │   │   ├── experiments/            # Model evaluation scripts
 │   │   ├── analysis/                # Statistical analysis
 │   │   ├── visualization/           # Plotting and charts
@@ -117,14 +117,14 @@ AnaphoraGym/
 │   │   └── utils/                   # Shared utilities
 │   └── mechanistic_analysis/       # Patchscopes analysis
 ├── results/                         # Experimental results
-│   ├── targeted_assessment/
+│   ├── targetted_assessment/
 │   └── mechanistic_analysis/
 ├── images/                          # Generated visualizations
 ├── config.yaml                      # Configuration file
 └── requirements.txt                 # Python dependencies
 ```
 
-For detailed module documentation, see [`scripts/targeted_assessment/README.md`](scripts/targeted_assessment/README.md).
+For detailed module documentation, see [`scripts/targetted_assessment/README.md`](scripts/targetted_assessment/README.md).
 
 ## Usage
 
@@ -135,13 +135,13 @@ The behavioral assessment evaluates models by comparing log-likelihoods of compe
 #### Single Model Evaluation
 
 ```bash
-python scripts/targeted_assessment/experiments/run_experiment.py \
+python scripts/targetted_assessment/experiments/run_experiment.py \
     --model "meta-llama/Llama-2-7b-hf"
 ```
 
 #### Batch Evaluation
 
-1. Edit `scripts/targeted_assessment/run_all.sh`:
+1. Edit `scripts/targetted_assessment/run_all.sh`:
    ```bash
    MODELS_TO_TEST=(
      "gpt2"
@@ -152,7 +152,7 @@ python scripts/targeted_assessment/experiments/run_experiment.py \
 
 2. Run the pipeline:
    ```bash
-   bash scripts/targeted_assessment/run_all.sh
+   bash scripts/targetted_assessment/run_all.sh
    ```
 
 #### Analysis and Visualization
@@ -161,26 +161,26 @@ After running experiments, generate summaries and visualizations:
 
 ```bash
 # Aggregate results across all models
-python scripts/targeted_assessment/analysis/aggregate_results.py
+python scripts/targetted_assessment/analysis/aggregate_results.py
 
 # Create comparison charts
-python scripts/targeted_assessment/visualization/create_bar_chart.py
-python scripts/targeted_assessment/visualization/create_faceted_chart.py
-python scripts/targeted_assessment/visualization/create_heatmap.py
+python scripts/targetted_assessment/visualization/create_bar_chart.py
+python scripts/targetted_assessment/visualization/create_faceted_chart.py
+python scripts/targetted_assessment/visualization/create_heatmap.py
 
 # Compare model types
-python scripts/targeted_assessment/analysis/compare_model_types.py
-python scripts/targeted_assessment/visualization/create_comparison_charts.py
+python scripts/targetted_assessment/analysis/compare_model_types.py
+python scripts/targetted_assessment/visualization/create_comparison_charts.py
 ```
 
 #### Data Processing
 
 ```bash
 # Concatenate all model results
-python scripts/targeted_assessment/data/concatenate_results.py
+python scripts/targetted_assessment/data/concatenate_results.py
 
 # Create enriched dataset with metrics
-python scripts/targeted_assessment/data/create_enriched_dataset.py
+python scripts/targetted_assessment/data/create_enriched_dataset.py
 ```
 
 ### Mechanistic Analysis
@@ -259,7 +259,7 @@ The `AnaphoraGym.csv` dataset is not publicly available in this repository. For 
 
 Results are saved in the following locations:
 
-- **Behavioral Assessment**: `results/targeted_assessment/`
+- **Behavioral Assessment**: `results/targetted_assessment/`
   - Individual model results: `AnaphoraGym_Results_<model_name>.csv`
   - Summary table: `model_comparison_summary.csv`
   - Concatenated results: `AnaphoraGym_All_Model_Results_Concatenated.csv`
@@ -330,4 +330,5 @@ For questions, dataset access requests, or collaboration inquiries, please conta
 ---
 
 **Note**: This is a research project. Results and interpretations should be considered in the context of the specific experimental setup and model versions used.
+
 
