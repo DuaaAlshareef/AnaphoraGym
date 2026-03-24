@@ -1,13 +1,16 @@
 #!/bin/bash
 #SBATCH --partition=gpu-single
 #SBATCH --tasks=1
-#SBATCH --time=02:00:00
+#SBATCH --time=04:00:00
 #SBATCH --mem=20gb
 #SBATCH --gres=gpu:1
 
 module load devel/miniforge
 conda activate virtual_env
 echo $(which python)
+
+# Pin HuggingFace cache to home dir so weights are reused across jobs
+export HF_HOME=~/.cache/huggingface
 
 # This script orchestrates the entire targeted assessment pipeline.
 # It should be run from the project's root directory.
@@ -19,7 +22,8 @@ echo "--- Starting Targeted Assessment ---"
 #   dataset/AnaphoraGym.csv            → main AnaphoraGym benchmark
 #   dataset/AnaphoraGym_Subconditions.csv → subconditions analysis
 # ============================================================
-DATASET_PATH="dataset/AnaphoraGym_Subconditions.csv"
+DATASET_PATH="dataset/AnaphoraGym.csv"
+# DATASET_PATH="dataset/AnaphoraGym_Subconditions.csv"
 
 # Auto-detect dataset type from filename (no manual change needed)
 if [[ "$DATASET_PATH" == *"Subconditions"* ]]; then
@@ -47,11 +51,10 @@ MODELS_TO_TEST=(
   # Qwen2.5 Family
   "Qwen/Qwen2.5-0.5B"
   "Qwen/Qwen2.5-0.5B-Instruct"
-  # "Qwen/Qwen2.5-7B"
-  # "Qwen/Qwen2.5-7B-Instruct"
-  # "Qwen/Qwen2.5-72B"
-  # "Qwen/Qwen2.5-72B-Instruct"
-  # "Qwen/Qwen2.5-3B-Instruct"
+  "Qwen/Qwen2.5-7B"
+  "Qwen/Qwen2.5-7B-Instruct"
+  "Qwen/Qwen2.5-72B"
+  "Qwen/Qwen2.5-72B-Instruct"
   # Olmo3 Family
   # "allenai/Olmo-3-7B-Think"
   # "allenai/OLMo-3-7B-Instruct"
