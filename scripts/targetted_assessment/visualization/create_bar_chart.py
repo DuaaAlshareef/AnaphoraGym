@@ -29,16 +29,19 @@ MODEL_SIZES = {
 }
 
 
-def create_bar_chart(summary_df=None, model_order=None):
+def create_bar_chart(summary_df=None, model_order=None, dataset_type: str = "anaphoragym"):
     """
     Generate and save a publication-quality grouped bar chart.
-    
+
     Args:
         summary_df: Summary DataFrame (if None, loads from file)
         model_order: List of model names in desired order (if None, infers from data)
+        dataset_type: "anaphoragym" or "subconditions"
     """
+    from utils.paths import resolve_dataset_type
+    dataset_type = resolve_dataset_type(dataset_type)
     if summary_df is None:
-        summary_df = load_summary_results()
+        summary_df = load_summary_results(dataset_type=dataset_type)
     
     if model_order is None:
         model_order = [
@@ -80,13 +83,23 @@ def create_bar_chart(summary_df=None, model_order=None):
         ordered=True
     )
     
+    # Scale width for subconditions (many more bars)
+    n_groups = summary_df['condition'].nunique()
+    fig_width = max(12, n_groups * 0.9)
+    chart_title = (
+        'Figure 1: Model Performance on Subconditions'
+        if dataset_type == "subconditions"
+        else 'Figure 1: Model Performance on the AnaphoraGym Benchmark'
+    )
+    x_label = 'Subcondition' if dataset_type == "subconditions" else 'Linguistic Condition'
+
     # Create plot
     plt.style.use('seaborn-v0_8-whitegrid')
     plt.rcParams['font.family'] = 'serif'
-    fig, ax = plt.subplots(figsize=(12, 7))
-    
+    fig, ax = plt.subplots(figsize=(fig_width, 7))
+
     palette = sns.color_palette('deep', n_colors=len(df_long['model_name'].unique()))
-    
+
     sns.barplot(
         data=df_long,
         x='condition',
@@ -95,15 +108,9 @@ def create_bar_chart(summary_df=None, model_order=None):
         ax=ax,
         palette=palette
     )
-    
-    ax.set_title(
-        'Figure 1: Model Performance on the AnaphoraGym Benchmark',
-        fontsize=16,
-        pad=20,
-        weight='bold',
-        loc='center'
-    )
-    ax.set_xlabel('Linguistic Condition', fontsize=12, weight='bold')
+
+    ax.set_title(chart_title, fontsize=16, pad=20, weight='bold', loc='center')
+    ax.set_xlabel(x_label, fontsize=12, weight='bold')
     ax.set_ylabel('Accuracy (%)', fontsize=12, weight='bold')
     plt.xticks(rotation=40, ha='right', fontsize=11)
     plt.yticks(fontsize=11)
@@ -130,5 +137,15 @@ def create_bar_chart(summary_df=None, model_order=None):
 
 
 if __name__ == "__main__":
-    create_bar_chart()
+    import argparse
+    parser = argparse.ArgumentParser(description="Create grouped bar chart from model results.")
+    parser.add_argument(
+        "--dataset-type",
+        type=str,
+        default="anaphoragym",
+        choices=["anaphoragym", "subconditions"],
+        help="Which dataset result bucket to plot.",
+    )
+    args = parser.parse_args()
+    create_bar_chart(dataset_type=args.dataset_type)
 

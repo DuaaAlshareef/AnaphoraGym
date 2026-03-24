@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --partition=gpu-single
 #SBATCH --tasks=1
-#SBATCH --time=01:00:00
-#SBATCH --mem=5gb
-#SBATCH --gres=gpu:A40:1 
+#SBATCH --time=02:00:00
+#SBATCH --mem=20gb
+#SBATCH --gres=gpu:1
 
 module load devel/miniforge
 conda activate virtual_env
@@ -12,7 +12,22 @@ echo $(which python)
 # This script orchestrates the entire targeted assessment pipeline.
 # It should be run from the project's root directory.
 
-echo "--- Starting Full AnaphoraGym Targeted Assessment ---"
+echo "--- Starting Targeted Assessment ---"
+
+# ============================================================
+# DATASET CONFIGURATION — only change this line to switch datasets:
+#   dataset/AnaphoraGym.csv            → main AnaphoraGym benchmark
+#   dataset/AnaphoraGym_Subconditions.csv → subconditions analysis
+# ============================================================
+DATASET_PATH="dataset/AnaphoraGym_Subconditions.csv"
+
+# Auto-detect dataset type from filename (no manual change needed)
+if [[ "$DATASET_PATH" == *"Subconditions"* ]]; then
+  DATASET_TYPE="subconditions"
+else
+  DATASET_TYPE="anaphoragym"
+fi
+echo "=> Dataset: $DATASET_PATH  (type: $DATASET_TYPE)"
 
 # --- Define Paths to Scripts ---
 EXPERIMENT_SCRIPT_PATH="scripts/targetted_assessment/experiments/run_experiment.py"
@@ -49,23 +64,21 @@ MODELS_TO_TEST=(
   # "google/gemma-2-9b-it"
   # "google/gemma-2-27b"
   # "google/gemma-2-27b-it"
-
-
   )
 
 # --- 1. Run the Experiments ---
-echo "--- Starting Full AnaphoraGym Targeted Assessment ---"
+echo "--- Starting $DATASET_TYPE Targeted Assessment ---"
 for model_name in "${MODELS_TO_TEST[@]}"
 do
   echo ""
   echo "============================================================="
   echo "=> Running experiment for model: $model_name"
   echo "============================================================="
-  python3 "$EXPERIMENT_SCRIPT_PATH" --model "$model_name"
-  
+  python3 "$EXPERIMENT_SCRIPT_PATH" --model "$model_name" --dataset "$DATASET_PATH" --dataset-type "$DATASET_TYPE"
+
   echo ""
   echo "=> Creating visualization for $model_name"
-  python3 "$VISUALIZE_SINGLE_MODEL_PATH" --model "$model_name"
+  python3 "$VISUALIZE_SINGLE_MODEL_PATH" --model "$model_name" --dataset-type "$DATASET_TYPE"
 done
 
 # --- 2. Run All Analysis and Plotting Scripts ---
@@ -76,8 +89,8 @@ echo ""
 echo "============================================================="
 echo "=> Running main analysis and creating primary bar chart..."
 echo "============================================================="
-python3 "$ANALYZE_RESULTS_PATH"
-python3 "$CREATE_BAR_CHART_PATH"
+python3 "$ANALYZE_RESULTS_PATH" --dataset-type "$DATASET_TYPE"
+python3 "$CREATE_BAR_CHART_PATH" --dataset-type "$DATASET_TYPE"
 
 # echo ""
 # echo "============================================================="
@@ -118,4 +131,6 @@ python3 "$CREATE_BAR_CHART_PATH"
 
 echo ""
 echo "--- Pipeline Complete ---"
+
+exit 0
 

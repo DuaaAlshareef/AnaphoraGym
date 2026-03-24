@@ -11,7 +11,7 @@ import sys
 
 # Add parent directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-from utils import get_results_dir, get_images_dir
+from utils import get_results_dir, get_images_dir, get_result_prefix, resolve_dataset_type
 
 # Set better defaults for clean text rendering
 sns.set_style("whitegrid")
@@ -25,13 +25,15 @@ plt.rcParams['legend.fontsize'] = 9
 plt.rcParams['figure.titlesize'] = 14
 
 
-def visualize_single_model(model_name: str):
+def visualize_single_model(model_name: str, dataset_type: str = "anaphoragym"):
     """Create visualization for a single model's results."""
     
     # Load results
-    results_dir = get_results_dir()
+    dataset_type = resolve_dataset_type(dataset_type)
+    results_dir = get_results_dir(dataset_type)
+    result_prefix = get_result_prefix(dataset_type)
     safe_model_name = model_name.replace('/', '_')
-    results_path = os.path.join(results_dir, f"AnaphoraGym_Results_{safe_model_name}.csv")
+    results_path = os.path.join(results_dir, f"{result_prefix}{safe_model_name}.csv")
     
     if not os.path.exists(results_path):
         print(f"❌ Results not found: {results_path}")
@@ -44,41 +46,51 @@ def visualize_single_model(model_name: str):
     print(f"   Total tests: {len(df)}")
     print(f"   Tests passed: {df['test_passed'].sum()}")
     print(f"   Overall accuracy: {df['test_passed'].mean() * 100:.1f}%")
-    
-    # Calculate accuracy by condition
-    accuracy_by_condition = df.groupby('condition').agg({
+
+    # For subconditions, group by sub_cond for fine-grained breakdown
+    group_col = (
+        "sub_cond"
+        if dataset_type == "subconditions" and "sub_cond" in df.columns
+        else "condition"
+    )
+
+    # Calculate accuracy by group
+    accuracy_by_condition = df.groupby(group_col).agg({
         'test_passed': ['sum', 'count', 'mean']
     }).reset_index()
-    accuracy_by_condition.columns = ['condition', 'passed', 'total', 'accuracy']
+    accuracy_by_condition.columns = [group_col, 'passed', 'total', 'accuracy']
     accuracy_by_condition['accuracy_pct'] = accuracy_by_condition['accuracy'] * 100
     accuracy_by_condition = accuracy_by_condition.sort_values('accuracy_pct', ascending=False)
-    
-    print(f"\n📊 Accuracy by condition:")
+
+    group_label = "Subcondition" if group_col == "sub_cond" else "Condition"
+    print(f"\n📊 Accuracy by {group_label.lower()}:")
     for _, row in accuracy_by_condition.iterrows():
-        print(f"   {row['condition']:30s}: {row['accuracy_pct']:5.1f}% ({row['passed']:.0f}/{row['total']:.0f})")
+        print(f"   {str(row[group_col]):40s}: {row['accuracy_pct']:5.1f}% ({row['passed']:.0f}/{row['total']:.0f})")
     
-    # Create visualization
-    fig, axes = plt.subplots(2, 2, figsize=(16, 11))
-    fig.suptitle(f'AnaphoraGym Assessment Results: {model_name}', 
+    # Scale figure height for subconditions (potentially many bars)
+    n_groups = len(accuracy_by_condition)
+    fig_height = max(11, n_groups * 0.45)
+    fig, axes = plt.subplots(2, 2, figsize=(16, fig_height))
+    fig.suptitle(f'AnaphoraGym Assessment Results: {model_name}',
                 fontsize=16, fontweight='bold', y=0.995)
-    
-    # 1. Accuracy by condition (bar chart)
+
+    # 1. Accuracy by condition/subcondition (horizontal bar chart)
     ax = axes[0, 0]
     colors = plt.cm.RdYlGn(accuracy_by_condition['accuracy_pct'] / 100)
-    bars = ax.barh(range(len(accuracy_by_condition)), accuracy_by_condition['accuracy_pct'], 
-                   color=colors, edgecolor='black', linewidth=1.5)
-    ax.set_yticks(range(len(accuracy_by_condition)))
-    ax.set_yticklabels(accuracy_by_condition['condition'], fontsize=10)
+    ax.barh(range(n_groups), accuracy_by_condition['accuracy_pct'],
+            color=colors, edgecolor='black', linewidth=1.5)
+    ax.set_yticks(range(n_groups))
+    ax.set_yticklabels(accuracy_by_condition[group_col], fontsize=9)
     ax.set_xlabel('Accuracy (%)', fontsize=11, fontweight='bold')
-    ax.set_title('Accuracy by Category', fontsize=12, fontweight='bold', pad=10)
+    ax.set_title(f'Accuracy by {group_label}', fontsize=12, fontweight='bold', pad=10)
     ax.set_xlim(0, 105)
     ax.axvline(50, color='gray', linestyle='--', alpha=0.5, linewidth=1.5, label='Chance')
     ax.legend(loc='lower right', framealpha=0.9)
     ax.grid(axis='x', alpha=0.3)
-    
+
     # Add value labels
     for i, val in enumerate(accuracy_by_condition['accuracy_pct']):
-        ax.text(val + 1.5, i, f'{val:.1f}%', va='center', ha='left', 
+        ax.text(val + 1.5, i, f'{val:.1f}%', va='center', ha='left',
                fontsize=9, fontweight='bold')
     
     # 2. Test difficulty (log odds distribution)
@@ -100,21 +112,21 @@ def visualize_single_model(model_name: str):
            bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.7, pad=0.7),
            fontsize=10, fontweight='bold', family='monospace')
     
-    # 3. Tests passed vs failed by condition
+    # 3. Tests passed vs failed by condition/subcondition
     ax = axes[1, 0]
-    pass_fail = df.groupby(['condition', 'test_passed']).size().unstack(fill_value=0)
-    
+    pass_fail = df.groupby([group_col, 'test_passed']).size().unstack(fill_value=0)
+
     x = np.arange(len(pass_fail))
     width = 0.35
-    
-    bars1 = ax.bar(x - width/2, pass_fail[False], width, label='Failed', 
-                  color='#ff7675', edgecolor='black', linewidth=0.5)
-    bars2 = ax.bar(x + width/2, pass_fail[True], width, label='Passed', 
-                  color='#74b9ff', edgecolor='black', linewidth=0.5)
-    
-    ax.set_xlabel('Category', fontsize=11, fontweight='bold')
+
+    ax.bar(x - width/2, pass_fail.get(False, 0), width, label='Failed',
+           color='#ff7675', edgecolor='black', linewidth=0.5)
+    ax.bar(x + width/2, pass_fail.get(True, 0), width, label='Passed',
+           color='#74b9ff', edgecolor='black', linewidth=0.5)
+
+    ax.set_xlabel(group_label, fontsize=11, fontweight='bold')
     ax.set_ylabel('Number of Tests', fontsize=11, fontweight='bold')
-    ax.set_title('Pass/Fail Distribution by Category', fontsize=12, fontweight='bold', pad=10)
+    ax.set_title(f'Pass/Fail Distribution by {group_label}', fontsize=12, fontweight='bold', pad=10)
     ax.set_xticks(x)
     ax.set_xticklabels(pass_fail.index, rotation=45, ha='right', fontsize=9)
     ax.legend(loc='upper right', framealpha=0.9)
@@ -129,11 +141,10 @@ def visualize_single_model(model_name: str):
     total_tests = len(df)
     passed_tests = df['test_passed'].sum()
     failed_tests = total_tests - passed_tests
-    n_conditions = df['condition'].nunique()
-    best_condition = accuracy_by_condition.iloc[0]
-    worst_condition = accuracy_by_condition.iloc[-1]
-    
-    # Create summary text with better formatting
+    n_groups_count = df[group_col].nunique()
+    best_group = accuracy_by_condition.iloc[0]
+    worst_group = accuracy_by_condition.iloc[-1]
+
     summary = f"""SUMMARY STATISTICS
 
 Model: {model_name}
@@ -143,15 +154,15 @@ Overall Performance:
   Passed:       {passed_tests:4d} ({overall_acc:5.1f}%)
   Failed:       {failed_tests:4d} ({100-overall_acc:5.1f}%)
 
-Categories:     {n_conditions}
+{group_label}s: {n_groups_count}
 
 Best Performance:
-  {best_condition['condition'][:25]}
-  Accuracy: {best_condition['accuracy_pct']:.1f}%
+  {str(best_group[group_col])[:30]}
+  Accuracy: {best_group['accuracy_pct']:.1f}%
 
 Worst Performance:
-  {worst_condition['condition'][:25]}
-  Accuracy: {worst_condition['accuracy_pct']:.1f}%
+  {str(worst_group[group_col])[:30]}
+  Accuracy: {worst_group['accuracy_pct']:.1f}%
 
 Log Odds Stats:
   Mean:         {df['logOdds'].mean():7.3f}
@@ -175,7 +186,8 @@ Log Odds Stats:
     print(f"\n✅ Saved visualization: {output_path}")
     
     # Save accuracy table to results/
-    table_path = os.path.join(results_dir, f"accuracy_by_condition_{safe_model_name}.csv")
+    table_filename = f"accuracy_by_{group_col}_{safe_model_name}.csv"
+    table_path = os.path.join(results_dir, table_filename)
     accuracy_by_condition.to_csv(table_path, index=False)
     print(f"✅ Saved accuracy table: {table_path}")
     
@@ -186,6 +198,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Visualize results for a single model")
     parser.add_argument("--model", type=str, required=True, 
                        help="Model name (e.g., gpt2)")
+    parser.add_argument(
+        "--dataset-type",
+        type=str,
+        default="anaphoragym",
+        choices=["anaphoragym", "subconditions"],
+        help="Which dataset result bucket to visualize."
+    )
     args = parser.parse_args()
     
-    visualize_single_model(args.model)
+    visualize_single_model(args.model, dataset_type=args.dataset_type)

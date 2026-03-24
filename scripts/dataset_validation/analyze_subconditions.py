@@ -1,5 +1,5 @@
 """
-Analyze subconditions in the Thesis-Subconditions AnaphoraGym Proof-of-Concept dataset.
+Analyze subconditions in the AnaphoraGym Subconditions dataset.
 
 This script:
 - Loads ONLY the thesis subconditions CSV
@@ -27,7 +27,7 @@ def load_thesis_subconditions_csv(project_root: Path) -> pd.DataFrame:
     csv_path = (
         project_root
         / "dataset"
-        / "Thesis-Subconditions-AnaphoraGym-ProofOfConcept-2025 - All_Subconditions.csv"
+        / "AnaphoraGym_Subconditions.csv"
     )
     if not csv_path.exists():
         raise FileNotFoundError(f"Could not find CSV at: {csv_path}")

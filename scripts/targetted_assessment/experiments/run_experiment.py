@@ -14,7 +14,14 @@ import sys
 
 # Add parent directory to path to import utils
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-from utils import load_dataset, load_model_and_tokenizer, get_results_dir
+from utils import (
+    load_dataset,
+    load_model_and_tokenizer,
+    get_results_dir,
+    get_result_prefix,
+    resolve_dataset_type,
+    detect_dataset_type_from_path,
+)
 
 
 def calculate_llh(model, tokenizer, input_text, continuation_text):
@@ -110,19 +117,23 @@ def calculate_llh(model, tokenizer, input_text, continuation_text):
     return average_llh.item()
 
 
-def run_assessment(model_name: str):
+def run_assessment(model_name: str, dataset_path: str = None, dataset_type: str = None):
     """
     Run the AnaphoraGym assessment for a specific model.
-    
-    Args:
-        model_name: Hugging Face model identifier
+
+    dataset_type is inferred automatically from the dataset filename when not given,
+    so the user only needs to change the dataset path.
     """
-    print(f"--- Running AnaphoraGym Assessment for: {model_name} ---")
+    # Auto-detect type from path if not explicitly provided
+    if dataset_type is None and dataset_path is not None:
+        dataset_type = detect_dataset_type_from_path(dataset_path)
+    dataset_type = resolve_dataset_type(dataset_type)
+    print(f"--- Running {dataset_type} assessment for: {model_name} ---")
     
-    # Load dataset
+    # Load dataset — auto-picks the correct CSV when no explicit path given
     try:
-        df = load_dataset()
-        print(f"Successfully loaded dataset")
+        df = load_dataset(dataset_path=dataset_path, dataset_type=dataset_type)
+        print(f"Successfully loaded dataset ({len(df)} rows)")
     except FileNotFoundError as e:
         print(f"[ERROR] {e}")
         return
@@ -232,9 +243,10 @@ def run_assessment(model_name: str):
         return
     
     results_df = pd.DataFrame(results)
-    results_dir = get_results_dir()
+    results_dir = get_results_dir(dataset_type)
+    result_prefix = get_result_prefix(dataset_type)
     safe_model_name = model_name.replace('/', '_')
-    output_filename = f"AnaphoraGym_Results_{safe_model_name}.csv"
+    output_filename = f"{result_prefix}{safe_model_name}.csv"
     output_path = os.path.join(results_dir, output_filename)
     
     results_df.to_csv(output_path, index=False)
@@ -251,6 +263,23 @@ if __name__ == "__main__":
         required=True,
         help="The name of the Hugging Face model to test."
     )
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        default=None,
+        help="Optional dataset CSV path. Defaults to dataset/AnaphoraGym.csv"
+    )
+    parser.add_argument(
+        "--dataset-type",
+        type=str,
+        default="anaphoragym",
+        choices=["anaphoragym", "subconditions"],
+        help="Output bucket and naming scheme."
+    )
     args = parser.parse_args()
-    run_assessment(model_name=args.model)
+    run_assessment(
+        model_name=args.model,
+        dataset_path=args.dataset,
+        dataset_type=args.dataset_type,
+    )
 

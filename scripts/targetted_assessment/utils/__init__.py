@@ -4,6 +4,11 @@ Shared utilities for the AnaphoraGym targeted assessment module.
 from .paths import (
     get_project_root,
     get_dataset_path,
+    get_subconditions_dataset_path,
+    detect_dataset_type_from_path,
+    resolve_dataset_type,
+    get_result_prefix,
+    get_results_root_dir,
     get_results_dir,
     get_images_dir,
     get_mechanistic_results_dir
@@ -21,6 +26,11 @@ from .model_loader import (
 __all__ = [
     'get_project_root',
     'get_dataset_path',
+    'get_subconditions_dataset_path',
+    'detect_dataset_type_from_path',
+    'resolve_dataset_type',
+    'get_result_prefix',
+    'get_results_root_dir',
     'get_results_dir',
     'get_images_dir',
     'get_mechanistic_results_dir',
